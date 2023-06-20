@@ -1,10 +1,12 @@
-const router = require("express").Router();
-const User = require("../models/User");
-const Post = require("../models/Post");
-const bcrypt = require("bcrypt");
+import express from "express";
+import { createError } from "../utlis/Error.js";
+import User from "../models/User.js";
+import bcrypt from "bcrypt";
+
+const router = express.Router();
 
 //UPDATE
-router.put("/:id", async (req, res) => {
+router.put("/:id", async (req, res, next) => {
   if (req.body.userId === req.params.id) {
     if (req.body.password) {
       const salt = await bcrypt.genSalt(10);
@@ -19,11 +21,11 @@ router.put("/:id", async (req, res) => {
         { new: true }
       );
       res.status(200).json(updatedUser);
-    } catch (err) {
-      res.status(500).json(err);
+    } catch (error) {
+      next(error);
     }
   } else {
-    res.status(401).json("You can update only your account!.");
+    next(createError(401, "You can update only your account!."));
   }
 });
 
@@ -59,4 +61,4 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
