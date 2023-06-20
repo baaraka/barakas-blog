@@ -1,15 +1,16 @@
-const router = require("express").Router();
-const User = require("../models/User");
-const Post = require("../models/Post");
+import express from "express";
+import Post from "../models/Post.js";
+
+const router = express.Router();
 
 //CREATE POST
-router.post("/", async (req, res) => {
-  const newPost = new Post(req, body);
+router.post("/", async (req, res, next) => {
+  const newPost = new Post(req.body);
   try {
     const savedPost = await newPost.save();
     res.status(200).json(savedPost);
-  } catch (err) {
-    res.status(500).json(err);
+  } catch (error) {
+    next(error);
   }
 });
 
@@ -90,4 +91,4 @@ router.get("/", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
