@@ -1,11 +1,12 @@
 import express from "express";
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
+import { createError } from "../utlis/Error.js";
 
 const router = express.Router();
 
 //REGISTER
-router.post("/register", async (req, res) => {
+router.post("/register", async (req, res, next) => {
   try {
     const salt = await bcrypt.genSalt(10);
     const hashedPass = await bcrypt.hash(req.body.password, salt);
@@ -17,19 +18,20 @@ router.post("/register", async (req, res) => {
     });
     await newUser.save();
     res.status(200).json("User created successfully");
-  } catch (err) {
-    res.status(500).json(err);
+  } catch (error) {
+    next(error);
   }
 });
 
 //LOGIN
-router.post("/login", async (req, res) => {
+router.post("/login", async (req, res, next) => {
   try {
     const user = await User.findOne({ username: req.body.username });
-    !user && req.status(400).json("User not found.");
+    if (!user) return next(createError(400, "User not found."));
 
     const validated = await bcrypt.compare(req.body.password, user.password);
-    !validated && req.status(400).json("wrong password or username!.");
+    if (!validated)
+      return next(createError(400, "wrong password or username!."));
 
     const { password, ...others } = user._doc;
 
