@@ -70,7 +70,7 @@ router.get("/:id", async (req, res, next) => {
 });
 
 //GET ALL POSTS
-router.get("/", async (req, res) => {
+router.get("/", async (req, res, next) => {
   const username = req.query.user;
   const catName = req.query.cat;
   try {
