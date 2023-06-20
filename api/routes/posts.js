@@ -1,5 +1,6 @@
 import express from "express";
 import Post from "../models/Post.js";
+import { createError } from "../utlis/Error.js";
 
 const router = express.Router();
 
@@ -15,7 +16,7 @@ router.post("/", async (req, res, next) => {
 });
 
 //UPDATE POST
-router.put("/:id", async (req, res) => {
+router.put("/:id", async (req, res, next) => {
   try {
     const post = await Post.findById(req.params.id);
     if (post.username === req.body.username) {
@@ -28,14 +29,14 @@ router.put("/:id", async (req, res) => {
           { new: true }
         );
         res.status(200).json(updatedPost);
-      } catch (err) {
-        res.status(500).json(err);
+      } catch (error) {
+        next(error);
       }
     } else {
-      res.status(401).json("You can update only your post!.");
+      next(createError(401, "You can update only your post!."));
     }
-  } catch (err) {
-    res.status(500).json(err);
+  } catch (error) {
+    next(error);
   }
 });
 
