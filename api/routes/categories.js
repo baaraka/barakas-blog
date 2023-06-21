@@ -1,23 +1,27 @@
-const router = require("express").Router();
-const Category = require("../models/Category");
+import express from "express";
+import Category from "../models/Category.js";
 
-router.post("/", async (req, res) => {
+const router = express.Router();
+
+//CREATE CATEGORIES
+router.post("/", async (req, res, next) => {
   const newCat = new Category(req.body);
   try {
     const savedCat = await newCat.save();
     res.status(200).json(savedCat);
-  } catch (err) {
-    res.status(500).json(err);
+  } catch (error) {
+    next(error);
   }
 });
 
-router.post("/", async (req, res) => {
+//GET CATEGORIES
+router.post("/", async (req, res, next) => {
   try {
     const cats = await Category.find();
     res.status(200).json(cats);
-  } catch (err) {
-    res.status(500).json(err);
+  } catch (error) {
+    next(error);
   }
 });
 
-module.exports = router;
+export default router;
