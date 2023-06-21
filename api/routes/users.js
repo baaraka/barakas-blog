@@ -2,6 +2,7 @@ import express from "express";
 import { createError } from "../utlis/Error.js";
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
+import Post from "../models/Post.js";
 
 const router = express.Router();
 
@@ -30,7 +31,7 @@ router.put("/:id", async (req, res, next) => {
 });
 
 //DELETE
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req, res, next) => {
   if (req.body.userId === req.params.id) {
     try {
       const user = await User.findById(req.params.id);
@@ -38,14 +39,14 @@ router.delete("/:id", async (req, res) => {
         await Post.deleteMany({ username: user.username });
         await User.findByIdAndDelete(req.params.id);
         res.status(200).json("User has been deleted...");
-      } catch (err) {
-        res.status(500).json(err);
+      } catch (error) {
+        next(error);
       }
-    } catch (err) {
-      res.status(404).json("User does not found!.");
+    } catch (error) {
+      next(error);
     }
   } else {
-    res.status(401).json("You can delete only your account!.");
+    next(createError(404, "You can delete only your account!."));
   }
 });
 
