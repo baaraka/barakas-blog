@@ -6,8 +6,16 @@ import userRoute from "./routes/users.js";
 import postRoute from "./routes/posts.js";
 import categoryRoute from "./routes/categories.js";
 import multer from "multer";
+import cors from "cors";
+import bodyParser from "body-parser";
 const app = express();
 dotenv.config();
+
+//middleware
+app.use(cors());
+app.use(express.json());
+app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
+app.use(bodyParser.json({ limit: "30mb", extended: true }));
 
 //mongodb connection
 const connect = async () => {
@@ -19,22 +27,23 @@ const connect = async () => {
   }
 };
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cd(null, "images");
-  },
-  filename: (req, file, cb) => {
-    cd(null, req.body.name);
-  },
-});
+// //set up storage for upload files
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, "./client/uploads/");
+//   },
+//   filename: (req, file, cb) => {
+//     cb(null, req.body.name);
+//   },
+// });
 
-const upload = multer({ storage: storage });
-app.post("/api/upload", upload.single("file"), (req, res) => {
-  res.status(200).json("File has been uploaded");
-});
+// //create upload middleware
+// const upload = multer({ storage: storage });
 
-//middleware
-app.use(express.json());
+// //API endpoint for image upload
+// app.post("/api/upload", upload.single("file"), (req, res) => {
+//   res.status(200).json("File has been uploaded");
+// });
 
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
