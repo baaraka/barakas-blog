@@ -1,11 +1,25 @@
 import express from "express";
 import Post from "../models/Post.js";
 import { createError } from "../utlis/Error.js";
+import multer from "multer";
 
 const router = express.Router();
 
+//set up storage for upload files
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./baraka-blog/public/uploads/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, req.body.name);
+  },
+});
+
+//create upload middleware
+const upload = multer({ storage: storage });
+
 //CREATE POST
-router.post("/", async (req, res, next) => {
+router.post("/", upload.single("photo"), async (req, res, next) => {
   const newPost = new Post(req.body);
   try {
     const savedPost = await newPost.save();
@@ -16,7 +30,7 @@ router.post("/", async (req, res, next) => {
 });
 
 //UPDATE POST
-router.put("/:id", async (req, res, next) => {
+router.put("/:id", upload.single("photoImg"), async (req, res, next) => {
   try {
     const post = await Post.findById(req.params.id);
     if (post.username === req.body.username) {
