@@ -27,23 +27,21 @@ const connect = async () => {
   }
 };
 
-// //set up storage for upload files
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, "./client/uploads/");
-//   },
-//   filename: (req, file, cb) => {
-//     cb(null, req.body.name);
-//   },
-// });
+// Set up storage for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./api/uploads/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
+});
 
-// //create upload middleware
-// const upload = multer({ storage: storage });
+// Create upload middleware
+const upload = multer({ storage: storage });
 
-// //API endpoint for image upload
-// app.post("/api/upload", upload.single("file"), (req, res) => {
-//   res.status(200).json("File has been uploaded");
-// });
+//API endpoint for image upload
+app.use(upload.single("photo"));
 
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
