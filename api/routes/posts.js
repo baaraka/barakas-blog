@@ -1,26 +1,32 @@
 import express from "express";
 import Post from "../models/Post.js";
-import { createError } from "../utlis/Error.js";
 import multer from "multer";
+import { createError } from "../utlis/Error.js";
 
 const router = express.Router();
 
-//set up storage for upload files
+// Set up storage for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "./baraka-blog/public/uploads/");
+    cb(null, "./api/uploads/");
   },
   filename: (req, file, cb) => {
-    cb(null, req.body.name);
+    cb(null, file.originalname);
   },
 });
 
-//create upload middleware
+// Create upload middleware
 const upload = multer({ storage: storage });
 
 //CREATE POST
 router.post("/", upload.single("photo"), async (req, res, next) => {
-  const newPost = new Post(req.body);
+  const newPost = new Post({
+    title: req.body.title,
+    desc: req.body.desc,
+    photo: req.file.filename,
+    username: req.body.username,
+    categories: req.body.categories,
+  });
   try {
     const savedPost = await newPost.save();
     res.status(200).json(savedPost);
@@ -38,7 +44,13 @@ router.put("/:id", upload.single("photoImg"), async (req, res, next) => {
         const updatedPost = await Post.findByIdAndUpdate(
           req.params.id,
           {
-            $set: req.body,
+            $set: {
+              title: req.body.title,
+              desc: req.body.desc,
+              photo: req.file.filename,
+              username: req.body.username,
+              categories: req.body.categories,
+            },
           },
           { new: true }
         );
