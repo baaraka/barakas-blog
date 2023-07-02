@@ -21,6 +21,8 @@ app.use(cors());
 app.use(express.json());
 app.use("/images", express.static(path.join(__dirname, "/images")));
 
+mongoose.set("strictQuery", false);
+
 //mongodb connection
 const connect = async () => {
   try {
